@@ -2,14 +2,10 @@ package tourGuide.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
@@ -29,25 +25,31 @@ import tripPricer.TripPricer;
 
 @Service
 public class TourGuideService {
-	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
+	private final Logger logger = LoggerFactory.getLogger(TourGuideService.class);
+	private static final long TRACKING_POLLING_INTERVAL = TimeUnit.MINUTES.toSeconds(5);
+
 	private final GpsUtil gpsUtil;
 	private final RewardsService rewardsService;
 	private final TripPricer tripPricer = new TripPricer();
-	public final Tracker tracker;
+	public final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+	public final Tracker tracker = new Tracker(this);
 	boolean testMode = true;
 	
 	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
+		Locale.setDefault(Locale.US);
 		this.gpsUtil = gpsUtil;
 		this.rewardsService = rewardsService;
-		
 		if(testMode) {
 			logger.info("TestMode enabled");
 			logger.debug("Initializing users");
 			initializeInternalUsers();
 			logger.debug("Finished initializing users");
 		}
-		tracker = new Tracker(this);
+	}
+
+	public void launchTracker(){
 		addShutDownHook();
+		scheduledExecutor.scheduleAtFixedRate(tracker::startTracking, 0, TRACKING_POLLING_INTERVAL, TimeUnit.SECONDS);
 	}
 	
 	public List<UserReward> getUserRewards(User user) {
@@ -55,10 +57,9 @@ public class TourGuideService {
 	}
 	
 	public VisitedLocation getUserLocation(User user) {
-		VisitedLocation visitedLocation = (user.getVisitedLocations().size() > 0) ?
+		return (user.getVisitedLocations().size() > 0) ?
 			user.getLastVisitedLocation() :
 			trackUserLocation(user);
-		return visitedLocation;
 	}
 	
 	public User getUser(String userName) {
@@ -66,7 +67,7 @@ public class TourGuideService {
 	}
 	
 	public List<User> getAllUsers() {
-		return internalUserMap.values().stream().collect(Collectors.toList());
+		return new ArrayList<>(internalUserMap.values());
 	}
 	
 	public void addUser(User user) {
@@ -76,13 +77,13 @@ public class TourGuideService {
 	}
 	
 	public List<Provider> getTripDeals(User user) {
-		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
+		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();
 		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(), 
 				user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
 		user.setTripDeals(providers);
 		return providers;
 	}
-	
+	//TODO synchronised me ralenti
 	public VisitedLocation trackUserLocation(User user) {
 		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
 		user.addToVisitedLocations(visitedLocation);
@@ -100,13 +101,14 @@ public class TourGuideService {
 		
 		return nearbyAttractions;
 	}
-	
+
 	private void addShutDownHook() {
-		Runtime.getRuntime().addShutdownHook(new Thread() { 
+		Runtime.getRuntime().addShutdownHook(new Thread() {
 		      public void run() {
 		        tracker.stopTracking();
-		      } 
-		    }); 
+		      }
+		    });
+		Runtime.getRuntime().addShutdownHook(new Thread(scheduledExecutor::shutdownNow));
 	}
 	
 	/**********************************************************************************
