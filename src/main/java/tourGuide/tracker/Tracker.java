@@ -31,7 +31,7 @@ public class Tracker {
 
 	public void startTracking() {
 		StopWatch stopWatch = new StopWatch();
-		executorService = Executors.newFixedThreadPool(10);
+		executorService = Executors.newFixedThreadPool(200);
 
 		if(Thread.currentThread().isInterrupted() || stop) {
 			logger.debug("Tracker stopping");
@@ -47,7 +47,7 @@ public class Tracker {
 		);
 		executorService.shutdown();
 		try {
-			boolean hasFinished = executorService.awaitTermination(200, TimeUnit.SECONDS);
+			boolean hasFinished = executorService.awaitTermination(300, TimeUnit.SECONDS);
 			if (!hasFinished) {
 				logger.debug("fail to finish before 200 sec");
 				tourGuideService.scheduledExecutor.shutdownNow();
