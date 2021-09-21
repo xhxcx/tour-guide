@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
@@ -13,9 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import gpsUtil.GpsUtil;
-import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
+import tourGuide.dto.ClosestAttractionDTO;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
@@ -91,15 +92,17 @@ public class TourGuideService {
 		return visitedLocation;
 	}
 
-	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
-		List<Attraction> nearbyAttractions = new ArrayList<>();
-		for(Attraction attraction : gpsUtil.getAttractions()) {
-			if(rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
-				nearbyAttractions.add(attraction);
-			}
-		}
-		
-		return nearbyAttractions;
+	public List<ClosestAttractionDTO> getNearByAttractions(VisitedLocation visitedLocation) {
+		TreeMap<Double, ClosestAttractionDTO> distanceOrderedAttractions = new TreeMap<>();
+
+		gpsUtil.getAttractions().forEach(attraction -> {
+			double distance = rewardsService.getDistance(attraction, visitedLocation.location);
+			distanceOrderedAttractions.put(distance,
+					new ClosestAttractionDTO(attraction.attractionName, new Location(attraction.latitude, attraction.longitude), visitedLocation.location,
+							distance, rewardsService.getRewardPoints(attraction, visitedLocation.userId)));
+		});
+
+		return distanceOrderedAttractions.values().stream().limit(5).collect(Collectors.toList());
 	}
 
 	private void addShutDownHook() {
