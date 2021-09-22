@@ -109,6 +109,23 @@ public class TourGuideService {
 				.collect(Collectors.toList());
 	}
 
+	public List<Map<String, Location>> getAllCurrentLocations() {
+		/*List<User> userList = getAllUsers();
+		List<UserCurrentLocationDTO> currentLocationDTOList = new CopyOnWriteArrayList<>();
+		userList.forEach(user -> {
+			currentLocationDTOList.add(new UserCurrentLocationDTO(user.getUserId().toString(),user.getLastVisitedLocation().location));
+		});
+		return currentLocationDTOList;*/
+		List<User> userList = getAllUsers();
+		List<Map<String, Location>> currentLocationDTOList = new CopyOnWriteArrayList<>();
+		userList.forEach(user -> {
+			Map<String, Location> currentUserPosition = new HashMap<>();
+			currentUserPosition.put(user.getUserId().toString(), user.getLastVisitedLocation().location);
+			currentLocationDTOList.add(currentUserPosition);
+		});
+		return currentLocationDTOList;
+	}
+
 	private void addShutDownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 		      public void run() {

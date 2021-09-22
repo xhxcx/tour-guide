@@ -3,10 +3,15 @@ package tourGuide;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.jsoniter.output.JsonStream;
+import gpsUtil.location.Location;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -81,10 +86,25 @@ public class TestTourGuideService {
 		assertEquals(5, attractions.size());
 	}
 
+	@Test
 	public void getTripDeals() {
 
 		List<Provider> providers = tourGuideService.getTripDeals(user);
 		
 		assertEquals(10, providers.size());
+	}
+
+	@Test
+	public void getAllCurrentLocations() {
+		List<User> userList = tourGuideService.getAllUsers();
+		User firstUser = userList.get(0);
+		DecimalFormat df = new DecimalFormat("#.######");
+		df.setRoundingMode(RoundingMode.HALF_UP);
+
+		String expected = "{\"" + firstUser.getUserId().toString() + "\":{\"longitude\":" + df.format(firstUser.getLastVisitedLocation().location.longitude) + ",\"latitude\":" + df.format(firstUser.getLastVisitedLocation().location.latitude) + "}";
+		List<Map<String, Location>> resultList = tourGuideService.getAllCurrentLocations();
+
+		Assert.assertEquals(userList.size(), resultList.size());
+		Assert.assertTrue(JsonStream.serialize(resultList).contains(expected));
 	}
 }
