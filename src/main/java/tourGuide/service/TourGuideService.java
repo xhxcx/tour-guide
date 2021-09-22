@@ -3,6 +3,7 @@ package tourGuide.service;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -84,7 +85,7 @@ public class TourGuideService {
 		user.setTripDeals(providers);
 		return providers;
 	}
-	//TODO synchronised me ralenti
+
 	public VisitedLocation trackUserLocation(User user) {
 		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
 		user.addToVisitedLocations(visitedLocation);
@@ -93,16 +94,19 @@ public class TourGuideService {
 	}
 
 	public List<ClosestAttractionDTO> getNearByAttractions(VisitedLocation visitedLocation) {
-		TreeMap<Double, ClosestAttractionDTO> distanceOrderedAttractions = new TreeMap<>();
+
+		List<ClosestAttractionDTO> closestAttractionDTOList = new ArrayList<>();
 
 		gpsUtil.getAttractions().forEach(attraction -> {
 			double distance = rewardsService.getDistance(attraction, visitedLocation.location);
-			distanceOrderedAttractions.put(distance,
-					new ClosestAttractionDTO(attraction.attractionName, new Location(attraction.latitude, attraction.longitude), visitedLocation.location,
-							distance, rewardsService.getRewardPoints(attraction, visitedLocation.userId)));
+			closestAttractionDTOList.add(new ClosestAttractionDTO(attraction.attractionName, new Location(attraction.latitude, attraction.longitude), visitedLocation.location,
+					distance, rewardsService.getRewardPoints(attraction, visitedLocation.userId)));
 		});
 
-		return distanceOrderedAttractions.values().stream().limit(5).collect(Collectors.toList());
+		return closestAttractionDTOList.stream()
+				.sorted(Comparator.comparingDouble(ClosestAttractionDTO::getDistance))
+				.limit(5)
+				.collect(Collectors.toList());
 	}
 
 	private void addShutDownHook() {
