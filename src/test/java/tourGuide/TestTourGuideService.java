@@ -19,6 +19,7 @@ import gpsUtil.GpsUtil;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
 import tourGuide.dto.ClosestAttractionDTO;
+import tourGuide.dto.UserPreferencesDTO;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
@@ -33,7 +34,7 @@ public class TestTourGuideService {
 
 	@Before
 	public void setUp() {
-		InternalTestHelper.setInternalUserNumber(0);
+		InternalTestHelper.setInternalUserNumber(1);
 	}
 
 	@Test
@@ -91,7 +92,7 @@ public class TestTourGuideService {
 
 		List<Provider> providers = tourGuideService.getTripDeals(user);
 		
-		assertEquals(10, providers.size());
+		assertEquals(5, providers.size());
 	}
 
 	@Test
@@ -106,5 +107,28 @@ public class TestTourGuideService {
 
 		Assert.assertEquals(userList.size(), resultList.size());
 		Assert.assertTrue(JsonStream.serialize(resultList).contains(expected));
+	}
+
+	@Test
+	public void setUserPreferences(){
+		List<User> userList = tourGuideService.getAllUsers();
+		User firstUser = userList.get(0);
+
+		UserPreferencesDTO userPreferencesDTO = new UserPreferencesDTO();
+		userPreferencesDTO.setNumberOfChildren(3);
+
+		Assert.assertEquals(0, firstUser.getUserPreferences().getNumberOfChildren());
+
+		tourGuideService.setUserPreferences(firstUser.getUserName(), userPreferencesDTO);
+
+		Assert.assertEquals(3, firstUser.getUserPreferences().getNumberOfChildren());
+	}
+
+	@Test
+	public void setUserPreferencesShouldReturnNull(){
+		UserPreferencesDTO userPreferencesDTO = new UserPreferencesDTO();
+		userPreferencesDTO.setNumberOfChildren(3);
+
+		Assert.assertNull(tourGuideService.setUserPreferences("toto", userPreferencesDTO));
 	}
 }

@@ -18,6 +18,8 @@ import gpsUtil.GpsUtil;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import tourGuide.dto.ClosestAttractionDTO;
+import tourGuide.dto.UserPreferencesDTO;
+import tourGuide.dto.mapper.UserPreferencesMapper;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
@@ -76,6 +78,15 @@ public class TourGuideService {
 		if(!internalUserMap.containsKey(user.getUserName())) {
 			internalUserMap.put(user.getUserName(), user);
 		}
+	}
+
+	public UserPreferencesDTO setUserPreferences(String userName, UserPreferencesDTO userPreferencesDTO) {
+		User user = getUser(userName);
+		if (user != null) {
+			user.setUserPreferences(UserPreferencesMapper.map(userPreferencesDTO));
+			return userPreferencesDTO;
+		}
+		return null;
 	}
 	
 	public List<Provider> getTripDeals(User user) {

@@ -3,13 +3,14 @@ package tourGuide;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.jsoniter.output.JsonStream;
 
 import gpsUtil.location.VisitedLocation;
+import tourGuide.dto.UserPreferencesDTO;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tripPricer.Provider;
@@ -62,6 +63,11 @@ public class TourGuideController {
     public String getTripDeals(@RequestParam String userName) {
     	List<Provider> providers = tourGuideService.getTripDeals(getUser(userName));
     	return JsonStream.serialize(providers);
+    }
+
+    @PostMapping("/userPreferences")
+    public ResponseEntity<Void> setUserPreferences(@RequestParam String userName, @RequestBody UserPreferencesDTO userPreferencesDTO) {
+        return new ResponseEntity<>(tourGuideService.setUserPreferences(userName, userPreferencesDTO) != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
     
     private User getUser(String userName) {
