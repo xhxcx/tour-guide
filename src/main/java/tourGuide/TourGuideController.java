@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.jsoniter.output.JsonStream;
 
-import gpsUtil.location.VisitedLocation;
 import tourGuide.dto.UserPreferencesDTO;
+import tourGuide.model.VisitedLocationTourGuide;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tripPricer.Provider;
@@ -19,7 +19,7 @@ import tripPricer.Provider;
 public class TourGuideController {
 
 	@Autowired
-	TourGuideService tourGuideService;
+	private TourGuideService tourGuideService;
 	
     @RequestMapping("/")
     public String index() {
@@ -28,14 +28,14 @@ public class TourGuideController {
     
     @RequestMapping("/getLocation") 
     public String getLocation(@RequestParam String userName) {
-    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
+    	VisitedLocationTourGuide visitedLocation = tourGuideService.trackUserLocation(getUser(userName));
 		return JsonStream.serialize(visitedLocation.location);
     }
     
     //  TODO: Change this method to no longer return a List of Attractions.
     @RequestMapping("/getNearbyAttractions") 
     public String getNearbyAttractions(@RequestParam String userName) {
-    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
+    	VisitedLocationTourGuide visitedLocation = tourGuideService.getUserLocation(getUser(userName));
     	return JsonStream.serialize(tourGuideService.getNearByAttractions(visitedLocation));
     }
     
@@ -73,6 +73,4 @@ public class TourGuideController {
     private User getUser(String userName) {
     	return tourGuideService.getUser(userName);
     }
-   
-
 }

@@ -1,13 +1,13 @@
 package tourGuide.dto;
 
-import gpsUtil.location.Location;
+import tourGuide.model.LocationTourGuide;
 
 public class UserCurrentLocationDTO {
 
     private String userId;
-    private Location userLastLocation;
+    private LocationTourGuide userLastLocation;
 
-    public UserCurrentLocationDTO(String userId, Location userLastLocation) {
+    public UserCurrentLocationDTO(String userId, LocationTourGuide userLastLocation) {
         this.userId = userId;
         this.userLastLocation = userLastLocation;
     }

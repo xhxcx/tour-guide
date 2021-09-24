@@ -1,20 +1,20 @@
 package tourGuide.user;
 
-import gpsUtil.location.Attraction;
-import gpsUtil.location.VisitedLocation;
+import tourGuide.model.AttractionTourGuide;
+import tourGuide.model.VisitedLocationTourGuide;
 
 public class UserReward {
 
-	public final VisitedLocation visitedLocation;
-	public final Attraction attraction;
+	public final VisitedLocationTourGuide visitedLocation;
+	public final AttractionTourGuide attraction;
 	private int rewardPoints;
-	public UserReward(VisitedLocation visitedLocation, Attraction attraction, int rewardPoints) {
+	public UserReward(VisitedLocationTourGuide visitedLocation, AttractionTourGuide attraction, int rewardPoints) {
 		this.visitedLocation = visitedLocation;
 		this.attraction = attraction;
 		this.rewardPoints = rewardPoints;
 	}
 	
-	public UserReward(VisitedLocation visitedLocation, Attraction attraction) {
+	public UserReward(VisitedLocationTourGuide visitedLocation, AttractionTourGuide attraction) {
 		this.visitedLocation = visitedLocation;
 		this.attraction = attraction;
 	}

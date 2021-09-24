@@ -1,6 +1,6 @@
 package tourGuide.dto;
 
-import gpsUtil.location.Location;
+import tourGuide.model.LocationTourGuide;
 
 public class ClosestAttractionDTO {
     // Name of Tourist attraction,
@@ -10,12 +10,12 @@ public class ClosestAttractionDTO {
     // The reward points for visiting each Attraction.
 
     private String attractionName;
-    private Location attractionLocation;
-    private Location userLocation;
+    private LocationTourGuide attractionLocation;
+    private LocationTourGuide userLocation;
     private double distance;
     private int rewardPointValue;
 
-    public ClosestAttractionDTO(String attractionName, Location attractionLocation, Location userLocation, double distance, int rewardPointValue) {
+    public ClosestAttractionDTO(String attractionName, LocationTourGuide attractionLocation, LocationTourGuide userLocation, double distance, int rewardPointValue) {
         this.attractionName = attractionName;
         this.attractionLocation = attractionLocation;
         this.userLocation = userLocation;
@@ -31,19 +31,19 @@ public class ClosestAttractionDTO {
         this.attractionName = attractionName;
     }
 
-    public Location getAttractionLocation() {
+    public LocationTourGuide getAttractionLocation() {
         return attractionLocation;
     }
 
-    public void setAttractionLocation(Location attractionLocation) {
+    public void setAttractionLocation(LocationTourGuide attractionLocation) {
         this.attractionLocation = attractionLocation;
     }
 
-    public Location getUserLocation() {
+    public LocationTourGuide getUserLocation() {
         return userLocation;
     }
 
-    public void setUserLocation(Location userLocation) {
+    public void setUserLocation(LocationTourGuide userLocation) {
         this.userLocation = userLocation;
     }
 

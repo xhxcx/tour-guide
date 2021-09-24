@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import gpsUtil.location.VisitedLocation;
+import tourGuide.model.VisitedLocationTourGuide;
 import tripPricer.Provider;
 
 public class User {
@@ -15,7 +15,7 @@ public class User {
 	private String phoneNumber;
 	private String emailAddress;
 	private Date latestLocationTimestamp;
-	private List<VisitedLocation> visitedLocations = new ArrayList<>();
+	private List<VisitedLocationTourGuide> visitedLocations = new ArrayList<>();
 	private List<UserReward> userRewards = new CopyOnWriteArrayList<>();
 	private UserPreferences userPreferences = new UserPreferences();
 	private List<Provider> tripDeals = new ArrayList<>();
@@ -58,11 +58,11 @@ public class User {
 		return latestLocationTimestamp;
 	}
 	
-	public void addToVisitedLocations(VisitedLocation visitedLocation) {
+	public void addToVisitedLocations(VisitedLocationTourGuide visitedLocation) {
 		visitedLocations.add(visitedLocation);
 	}
 	
-	public List<VisitedLocation> getVisitedLocations() {
+	public List<VisitedLocationTourGuide> getVisitedLocations() {
 		return visitedLocations;
 	}
 	
@@ -88,7 +88,7 @@ public class User {
 		this.userPreferences = userPreferences;
 	}
 
-	public VisitedLocation getLastVisitedLocation() {
+	public VisitedLocationTourGuide getLastVisitedLocation() {
 		return visitedLocations.get(visitedLocations.size() - 1);
 	}
 	

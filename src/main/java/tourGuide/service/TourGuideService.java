@@ -12,15 +12,16 @@ import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import gpsUtil.GpsUtil;
-import gpsUtil.location.Location;
-import gpsUtil.location.VisitedLocation;
 import tourGuide.dto.ClosestAttractionDTO;
 import tourGuide.dto.UserPreferencesDTO;
 import tourGuide.dto.mapper.UserPreferencesMapper;
 import tourGuide.helper.InternalTestHelper;
+import tourGuide.model.LocationTourGuide;
+import tourGuide.model.VisitedLocationTourGuide;
+import tourGuide.proxy.GpsUtilProxy;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
@@ -32,16 +33,17 @@ public class TourGuideService {
 	private final Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 	private static final long TRACKING_POLLING_INTERVAL = TimeUnit.MINUTES.toSeconds(5);
 
-	private final GpsUtil gpsUtil;
+	@Autowired
+	private GpsUtilProxy gpsUtil;
+
 	private final RewardsService rewardsService;
 	private final TripPricer tripPricer = new TripPricer();
 	public final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 	public final Tracker tracker = new Tracker(this);
 	boolean testMode = true;
 	
-	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
+	public TourGuideService(RewardsService rewardsService) {
 		Locale.setDefault(Locale.US);
-		this.gpsUtil = gpsUtil;
 		this.rewardsService = rewardsService;
 		if(testMode) {
 			logger.info("TestMode enabled");
@@ -60,7 +62,7 @@ public class TourGuideService {
 		return user.getUserRewards();
 	}
 	
-	public VisitedLocation getUserLocation(User user) {
+	public VisitedLocationTourGuide getUserLocation(User user) {
 		return (user.getVisitedLocations().size() > 0) ?
 			user.getLastVisitedLocation() :
 			trackUserLocation(user);
@@ -97,20 +99,20 @@ public class TourGuideService {
 		return providers;
 	}
 
-	public VisitedLocation trackUserLocation(User user) {
-		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
+	public VisitedLocationTourGuide trackUserLocation(User user) {
+		VisitedLocationTourGuide visitedLocation = gpsUtil.getUserLocation(user.getUserId().toString()).getBody();
 		user.addToVisitedLocations(visitedLocation);
 		rewardsService.calculateRewards(user);
 		return visitedLocation;
 	}
 
-	public List<ClosestAttractionDTO> getNearByAttractions(VisitedLocation visitedLocation) {
+	public List<ClosestAttractionDTO> getNearByAttractions(VisitedLocationTourGuide visitedLocation) {
 
 		List<ClosestAttractionDTO> closestAttractionDTOList = new ArrayList<>();
 
-		gpsUtil.getAttractions().forEach(attraction -> {
+		Objects.requireNonNull(gpsUtil.getAttractions().getBody()).forEach(attraction -> {
 			double distance = rewardsService.getDistance(attraction, visitedLocation.location);
-			closestAttractionDTOList.add(new ClosestAttractionDTO(attraction.attractionName, new Location(attraction.latitude, attraction.longitude), visitedLocation.location,
+			closestAttractionDTOList.add(new ClosestAttractionDTO(attraction.attractionName, new LocationTourGuide(attraction.latitude, attraction.longitude), visitedLocation.location,
 					distance, rewardsService.getRewardPoints(attraction, visitedLocation.userId)));
 		});
 
@@ -120,7 +122,7 @@ public class TourGuideService {
 				.collect(Collectors.toList());
 	}
 
-	public List<Map<String, Location>> getAllCurrentLocations() {
+	public List<Map<String, LocationTourGuide>> getAllCurrentLocations() {
 		/*List<User> userList = getAllUsers();
 		List<UserCurrentLocationDTO> currentLocationDTOList = new CopyOnWriteArrayList<>();
 		userList.forEach(user -> {
@@ -128,9 +130,9 @@ public class TourGuideService {
 		});
 		return currentLocationDTOList;*/
 		List<User> userList = getAllUsers();
-		List<Map<String, Location>> currentLocationDTOList = new CopyOnWriteArrayList<>();
+		List<Map<String, LocationTourGuide>> currentLocationDTOList = new CopyOnWriteArrayList<>();
 		userList.forEach(user -> {
-			Map<String, Location> currentUserPosition = new HashMap<>();
+			Map<String, LocationTourGuide> currentUserPosition = new HashMap<>();
 			currentUserPosition.put(user.getUserId().toString(), user.getLastVisitedLocation().location);
 			currentLocationDTOList.add(currentUserPosition);
 		});
@@ -169,7 +171,7 @@ public class TourGuideService {
 	
 	private void generateUserLocationHistory(User user) {
 		IntStream.range(0, 3).forEach(i-> {
-			user.addToVisitedLocations(new VisitedLocation(user.getUserId(), new Location(generateRandomLatitude(), generateRandomLongitude()), getRandomTime()));
+			user.addToVisitedLocations(new VisitedLocationTourGuide(user.getUserId(), new LocationTourGuide(generateRandomLatitude(), generateRandomLongitude()), getRandomTime()));
 		});
 	}
 	

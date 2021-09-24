@@ -10,26 +10,27 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.jsoniter.output.JsonStream;
-import gpsUtil.location.Location;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import gpsUtil.GpsUtil;
-import gpsUtil.location.VisitedLocation;
+import org.springframework.beans.factory.annotation.Autowired;
 import rewardCentral.RewardCentral;
 import tourGuide.dto.ClosestAttractionDTO;
 import tourGuide.dto.UserPreferencesDTO;
 import tourGuide.helper.InternalTestHelper;
+import tourGuide.model.LocationTourGuide;
+import tourGuide.model.VisitedLocationTourGuide;
+import tourGuide.proxy.GpsUtilProxy;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tripPricer.Provider;
 
 public class TestTourGuideService {
-	private final GpsUtil gpsUtil = new GpsUtil();
-	private final RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
-	private final TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+
+	private final RewardsService rewardsService = new RewardsService(new RewardCentral());
+	private final TourGuideService tourGuideService = new TourGuideService(rewardsService);
 	private final User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 
 	@Before
@@ -40,7 +41,7 @@ public class TestTourGuideService {
 	@Test
 	public void getUserLocation() {
 		//TODO pk on mock pas le visitedLocation attendu puis spy sur trackUserLocation ?
-		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
+		VisitedLocationTourGuide visitedLocation = tourGuideService.trackUserLocation(user);
 		assertEquals(visitedLocation.userId, user.getUserId());
 	}
 	
@@ -73,14 +74,14 @@ public class TestTourGuideService {
 	
 	@Test
 	public void trackUser() {
-		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
+		VisitedLocationTourGuide visitedLocation = tourGuideService.trackUserLocation(user);
 		
 		assertEquals(user.getUserId(), visitedLocation.userId);
 	}
 
 	@Test
 	public void getNearbyAttractions() {
-		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
+		VisitedLocationTourGuide visitedLocation = tourGuideService.trackUserLocation(user);
 		
 		List<ClosestAttractionDTO> attractions = tourGuideService.getNearByAttractions(visitedLocation);
 		
@@ -103,7 +104,7 @@ public class TestTourGuideService {
 		df.setRoundingMode(RoundingMode.HALF_UP);
 
 		String expected = "{\"" + firstUser.getUserId().toString() + "\":{\"longitude\":" + df.format(firstUser.getLastVisitedLocation().location.longitude) + ",\"latitude\":" + df.format(firstUser.getLastVisitedLocation().location.latitude) + "}";
-		List<Map<String, Location>> resultList = tourGuideService.getAllCurrentLocations();
+		List<Map<String, LocationTourGuide>> resultList = tourGuideService.getAllCurrentLocations();
 
 		Assert.assertEquals(userList.size(), resultList.size());
 		Assert.assertTrue(JsonStream.serialize(resultList).contains(expected));
