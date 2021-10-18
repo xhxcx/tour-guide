@@ -3,7 +3,7 @@ package tourGuide.tracker;
 import java.util.List;
 import java.util.concurrent.*;
 
-import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +54,7 @@ public class Tracker {
 			}
 			else {
 				stopWatch.stop();
-				logger.debug("finished in " + stopWatch.getTime(TimeUnit.SECONDS));
+				logger.debug("finished in " + TimeUnit.SECONDS.toSeconds(stopWatch.getTime()));
 			}
 
 		} catch (InterruptedException e) {

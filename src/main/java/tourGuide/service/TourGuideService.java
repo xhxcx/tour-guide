@@ -20,13 +20,13 @@ import tourGuide.dto.UserPreferencesDTO;
 import tourGuide.dto.mapper.UserPreferencesMapper;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.LocationTourGuide;
+import tourGuide.model.ProviderTourGuide;
 import tourGuide.model.VisitedLocationTourGuide;
 import tourGuide.proxy.GpsUtilProxy;
+import tourGuide.proxy.TripPricerProxy;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
-import tripPricer.Provider;
-import tripPricer.TripPricer;
 
 @Service
 public class TourGuideService {
@@ -35,9 +35,10 @@ public class TourGuideService {
 
 	@Autowired
 	private GpsUtilProxy gpsUtil;
+	@Autowired
+	private TripPricerProxy tripPricerProxy;
 
 	private final RewardsService rewardsService;
-	private final TripPricer tripPricer = new TripPricer();
 	public final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 	public final Tracker tracker = new Tracker(this);
 	boolean testMode = true;
@@ -91,10 +92,10 @@ public class TourGuideService {
 		return null;
 	}
 	
-	public List<Provider> getTripDeals(User user) {
+	public List<ProviderTourGuide> getTripDeals(User user) {
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();
-		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(), 
-				user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
+		List<ProviderTourGuide> providers = tripPricerProxy.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),
+				user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints).getBody();
 		user.setTripDeals(providers);
 		return providers;
 	}

@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import com.jsoniter.output.JsonStream;
 
 import tourGuide.dto.UserPreferencesDTO;
+import tourGuide.model.ProviderTourGuide;
 import tourGuide.model.VisitedLocationTourGuide;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
-import tripPricer.Provider;
 
 @RestController
 public class TourGuideController {
@@ -60,7 +60,7 @@ public class TourGuideController {
     
     @RequestMapping("/getTripDeals")
     public String getTripDeals(@RequestParam String userName) {
-    	List<Provider> providers = tourGuideService.getTripDeals(getUser(userName));
+    	List<ProviderTourGuide> providers = tourGuideService.getTripDeals(getUser(userName));
     	return JsonStream.serialize(providers);
     }
 

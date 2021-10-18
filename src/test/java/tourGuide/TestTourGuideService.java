@@ -19,11 +19,11 @@ import tourGuide.dto.ClosestAttractionDTO;
 import tourGuide.dto.UserPreferencesDTO;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.LocationTourGuide;
+import tourGuide.model.ProviderTourGuide;
 import tourGuide.model.VisitedLocationTourGuide;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
-import tripPricer.Provider;
 
 @SpringBootTest
 public class TestTourGuideService {
@@ -90,7 +90,7 @@ public class TestTourGuideService {
 	@Test
 	public void getTripDeals() {
 
-		List<Provider> providers = tourGuideService.getTripDeals(user);
+		List<ProviderTourGuide> providers = tourGuideService.getTripDeals(user);
 		
 		assertEquals(5, providers.size());
 	}

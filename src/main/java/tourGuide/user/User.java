@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import tourGuide.model.ProviderTourGuide;
 import tourGuide.model.VisitedLocationTourGuide;
-import tripPricer.Provider;
 
 public class User {
 	private final UUID userId;
@@ -18,7 +18,7 @@ public class User {
 	private List<VisitedLocationTourGuide> visitedLocations = new ArrayList<>();
 	private List<UserReward> userRewards = new CopyOnWriteArrayList<>();
 	private UserPreferences userPreferences = new UserPreferences();
-	private List<Provider> tripDeals = new ArrayList<>();
+	private List<ProviderTourGuide> tripDeals = new ArrayList<>();
 	public User(UUID userId, String userName, String phoneNumber, String emailAddress) {
 		this.userId = userId;
 		this.userName = userName;
@@ -92,11 +92,11 @@ public class User {
 		return visitedLocations.get(visitedLocations.size() - 1);
 	}
 	
-	public void setTripDeals(List<Provider> tripDeals) {
+	public void setTripDeals(List<ProviderTourGuide> tripDeals) {
 		this.tripDeals = tripDeals;
 	}
 	
-	public List<Provider> getTripDeals() {
+	public List<ProviderTourGuide> getTripDeals() {
 		return tripDeals;
 	}
 
