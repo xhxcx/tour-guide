@@ -14,22 +14,21 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import rewardCentral.RewardCentral;
+import org.springframework.boot.test.context.SpringBootTest;
 import tourGuide.dto.ClosestAttractionDTO;
 import tourGuide.dto.UserPreferencesDTO;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.LocationTourGuide;
 import tourGuide.model.VisitedLocationTourGuide;
-import tourGuide.proxy.GpsUtilProxy;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tripPricer.Provider;
 
+@SpringBootTest
 public class TestTourGuideService {
 
-	private final RewardsService rewardsService = new RewardsService(new RewardCentral());
+	private final RewardsService rewardsService = new RewardsService();
 	private final TourGuideService tourGuideService = new TourGuideService(rewardsService);
 	private final User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 

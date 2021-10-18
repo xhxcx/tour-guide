@@ -5,14 +5,12 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import rewardCentral.RewardCentral;
 import tourGuide.model.AttractionTourGuide;
 import tourGuide.model.LocationTourGuide;
 import tourGuide.model.VisitedLocationTourGuide;
 import tourGuide.proxy.GpsUtilProxy;
+import tourGuide.proxy.RewardCentralProxy;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
@@ -22,14 +20,15 @@ public class RewardsService {
 
     @Autowired
 	private GpsUtilProxy gpsUtil;
+
+    @Autowired
+	private RewardCentralProxy rewardCentral;
 	// proximity in miles
     private final int defaultProximityBuffer = 10;
 	private int proximityBuffer = defaultProximityBuffer;
 	private int attractionProximityRange = 200;
-	private final RewardCentral rewardsCentral;
 	
-	public RewardsService(RewardCentral rewardCentral) {
-		this.rewardsCentral = rewardCentral;
+	public RewardsService() {
 	}
 	
 	public void setProximityBuffer(int proximityBuffer) {
@@ -65,7 +64,7 @@ public class RewardsService {
 	}
 	
 	public int getRewardPoints(AttractionTourGuide attraction, UUID userId) {
-		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, userId);
+		return rewardCentral.getAttractionRewardPoints(attraction.attractionId.toString(), userId.toString()).getBody();
 	}
 	
 	public double getDistance(AttractionTourGuide attractionTourGuide, LocationTourGuide locationTourGuide) {

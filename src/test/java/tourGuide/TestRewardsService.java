@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.junit.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import rewardCentral.RewardCentral;
+import org.springframework.boot.test.context.SpringBootTest;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.AttractionTourGuide;
 import tourGuide.model.VisitedLocationTourGuide;
@@ -20,12 +20,13 @@ import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
+@SpringBootTest
 public class TestRewardsService {
 
 	@Autowired
 	private GpsUtilProxy gpsUtil;
 
-	private final RewardsService rewardsService = new RewardsService(new RewardCentral());
+	private final RewardsService rewardsService = new RewardsService();
 	private final TourGuideService tourGuideService = new TourGuideService(rewardsService);
 
 	@Test

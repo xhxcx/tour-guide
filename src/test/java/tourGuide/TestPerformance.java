@@ -5,13 +5,14 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import rewardCentral.RewardCentral;
+import org.springframework.boot.test.context.SpringBootTest;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.AttractionTourGuide;
 import tourGuide.model.VisitedLocationTourGuide;
@@ -21,6 +22,7 @@ import tourGuide.service.TourGuideService;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
 
+@SpringBootTest
 public class TestPerformance {
 	
 	/*
@@ -44,12 +46,12 @@ public class TestPerformance {
 	 */
 
 	@Autowired
-	private GpsUtilProxy gpsUtil;
+	private GpsUtilProxy gpsUtilProxy;
 
 	@Test
 	public void highVolumeTrackLocation() {
 
-		RewardsService rewardsService = new RewardsService(new RewardCentral());
+		RewardsService rewardsService = new RewardsService();
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
 		InternalTestHelper.setInternalUserNumber(100000);
 		TourGuideService tourGuideService = new TourGuideService(rewardsService);
@@ -68,15 +70,15 @@ public class TestPerformance {
 
 	@Test
 	public void highVolumeGetRewards() {
-		RewardsService rewardsService = new RewardsService(new RewardCentral());
+		RewardsService rewardsService = new RewardsService();
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-		InternalTestHelper.setInternalUserNumber(100000);
+		InternalTestHelper.setInternalUserNumber(10000);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		TourGuideService tourGuideService = new TourGuideService(rewardsService);
 		
-	    AttractionTourGuide attraction = gpsUtil.getAttractions().getBody().get(0);
+	    AttractionTourGuide attraction = Objects.requireNonNull(gpsUtilProxy.getAttractions().getBody()).get(0);
 		List<User> allUsers = new ArrayList<>();
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocationTourGuide(u.getUserId(), attraction, new Date())));

@@ -31,8 +31,7 @@ public class TourGuideController {
     	VisitedLocationTourGuide visitedLocation = tourGuideService.trackUserLocation(getUser(userName));
 		return JsonStream.serialize(visitedLocation.location);
     }
-    
-    //  TODO: Change this method to no longer return a List of Attractions.
+
     @RequestMapping("/getNearbyAttractions") 
     public String getNearbyAttractions(@RequestParam String userName) {
     	VisitedLocationTourGuide visitedLocation = tourGuideService.getUserLocation(getUser(userName));
