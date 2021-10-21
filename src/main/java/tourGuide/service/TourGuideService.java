@@ -33,17 +33,16 @@ public class TourGuideService {
 	private final Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 	private static final long TRACKING_POLLING_INTERVAL = TimeUnit.MINUTES.toSeconds(5);
 
-	@Autowired
-	private GpsUtilProxy gpsUtil;
-	@Autowired
-	private TripPricerProxy tripPricerProxy;
+	private final GpsUtilProxy gpsUtil;
+	private final TripPricerProxy tripPricerProxy;
 
 	private final RewardsService rewardsService;
 	public final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 	public final Tracker tracker = new Tracker(this);
 	boolean testMode = true;
 	
-	public TourGuideService(RewardsService rewardsService) {
+	@Autowired
+	public TourGuideService(RewardsService rewardsService, GpsUtilProxy gpsUtil, TripPricerProxy tripPricerProxy) {
 		Locale.setDefault(Locale.US);
 		this.rewardsService = rewardsService;
 		if(testMode) {
@@ -52,6 +51,8 @@ public class TourGuideService {
 			initializeInternalUsers();
 			logger.debug("Finished initializing users");
 		}
+		this.gpsUtil = gpsUtil;
+		this.tripPricerProxy = tripPricerProxy;
 	}
 
 	public void launchTracker(){
@@ -124,12 +125,6 @@ public class TourGuideService {
 	}
 
 	public List<Map<String, LocationTourGuide>> getAllCurrentLocations() {
-		/*List<User> userList = getAllUsers();
-		List<UserCurrentLocationDTO> currentLocationDTOList = new CopyOnWriteArrayList<>();
-		userList.forEach(user -> {
-			currentLocationDTOList.add(new UserCurrentLocationDTO(user.getUserId().toString(),user.getLastVisitedLocation().location));
-		});
-		return currentLocationDTOList;*/
 		List<User> userList = getAllUsers();
 		List<Map<String, LocationTourGuide>> currentLocationDTOList = new CopyOnWriteArrayList<>();
 		userList.forEach(user -> {

@@ -15,9 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import tourGuide.dto.UserPreferencesDTO;
 import tourGuide.service.TourGuideService;
-import tourGuide.user.User;
-
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -36,8 +33,6 @@ public class TourGuideControllerTest {
 
     @Test
     public void setUserPreferencesShouldReturn200WhenPreferencesAreSetOnExistingUser() throws Exception{
-        User user = new User(new UUID(1,2), "name", "123564", "email");
-
         UserPreferencesDTO userPreferencesDTO = new UserPreferencesDTO();
         userPreferencesDTO.setNumberOfChildren(3);
 

@@ -35,7 +35,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:2.1.2.RELEASE'
 
     testCompile("junit:junit")
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.1.6.RELEASE'
+    testCompile("org.springframework.boot:spring-boot-starter-test")
 }
 
 

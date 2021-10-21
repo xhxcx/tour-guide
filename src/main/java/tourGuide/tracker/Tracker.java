@@ -7,9 +7,12 @@ import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 
+@Service
 public class Tracker {
 	private final Logger logger = LoggerFactory.getLogger(Tracker.class);
 	private final TourGuideService tourGuideService;
@@ -17,6 +20,7 @@ public class Tracker {
 	private boolean stop = false;
 	public ExecutorService executorService;
 
+	@Autowired
 	public Tracker(TourGuideService tourGuideService) {
 		this.tourGuideService = tourGuideService;
 	}

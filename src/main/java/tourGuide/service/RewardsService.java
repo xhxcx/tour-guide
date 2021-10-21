@@ -18,17 +18,18 @@ import tourGuide.user.UserReward;
 public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
 
-    @Autowired
-	private GpsUtilProxy gpsUtil;
+    private final GpsUtilProxy gpsUtil;
 
-    @Autowired
-	private RewardCentralProxy rewardCentral;
+    private final RewardCentralProxy rewardCentral;
 	// proximity in miles
     private final int defaultProximityBuffer = 10;
 	private int proximityBuffer = defaultProximityBuffer;
 	private int attractionProximityRange = 200;
-	
-	public RewardsService() {
+
+	@Autowired
+	public RewardsService(GpsUtilProxy gpsUtil, RewardCentralProxy rewardCentral) {
+		this.gpsUtil = gpsUtil;
+		this.rewardCentral = rewardCentral;
 	}
 	
 	public void setProximityBuffer(int proximityBuffer) {
