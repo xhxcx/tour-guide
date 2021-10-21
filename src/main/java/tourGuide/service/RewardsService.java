@@ -61,7 +61,7 @@ public class RewardsService {
 	}
 	
 	private boolean nearAttraction(VisitedLocationTourGuide visitedLocation, AttractionTourGuide attraction) {
-		return getDistance(attraction, visitedLocation.location) <= proximityBuffer;
+		return getDistance(attraction, visitedLocation.location) <= Double.valueOf(proximityBuffer);
 	}
 	
 	public int getRewardPoints(AttractionTourGuide attraction, UUID userId) {

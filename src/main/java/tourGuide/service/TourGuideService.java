@@ -129,7 +129,7 @@ public class TourGuideService {
 		List<Map<String, LocationTourGuide>> currentLocationDTOList = new CopyOnWriteArrayList<>();
 		userList.forEach(user -> {
 			Map<String, LocationTourGuide> currentUserPosition = new HashMap<>();
-			currentUserPosition.put(user.getUserId().toString(), user.getLastVisitedLocation().location);
+			currentUserPosition.put(user.getUserId().toString(), getUserLocation(user).location);
 			currentLocationDTOList.add(currentUserPosition);
 		});
 		return currentLocationDTOList;

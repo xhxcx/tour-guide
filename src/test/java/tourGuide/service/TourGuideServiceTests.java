@@ -1,6 +1,5 @@
 package tourGuide.service;
 
-import com.jsoniter.output.JsonStream;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -128,7 +127,6 @@ public class TourGuideServiceTests {
 
     }
 
-    // TODO bof le TU
     @Test
     public void getAllCurrentLocations() {
         List<User> userList = tourGuideService.getAllUsers();
@@ -136,10 +134,10 @@ public class TourGuideServiceTests {
         DecimalFormat df = new DecimalFormat("#.######");
         df.setRoundingMode(RoundingMode.HALF_UP);
 
-        String expected = "{\"" + firstUser.getUserId().toString() + "\":{\"longitude\":" + df.format(firstUser.getLastVisitedLocation().location.longitude) + ",\"latitude\":" + df.format(firstUser.getLastVisitedLocation().location.latitude) + "}";
         List<Map<String, LocationTourGuide>> resultList = tourGuideService.getAllCurrentLocations();
 
         Assert.assertEquals(userList.size(), resultList.size());
-        Assert.assertTrue(JsonStream.serialize(resultList).contains(expected));
+        Assert.assertTrue(resultList.get(0).containsKey(firstUser.getUserId().toString()));
+        Assert.assertTrue(resultList.get(0).containsValue(firstUser.getLastVisitedLocation().location));
     }
 }

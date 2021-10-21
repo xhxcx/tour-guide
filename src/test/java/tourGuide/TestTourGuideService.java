@@ -3,33 +3,32 @@ package tourGuide;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import com.jsoniter.output.JsonStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import tourGuide.dto.ClosestAttractionDTO;
 import tourGuide.dto.UserPreferencesDTO;
 import tourGuide.helper.InternalTestHelper;
-import tourGuide.model.LocationTourGuide;
 import tourGuide.model.ProviderTourGuide;
 import tourGuide.model.VisitedLocationTourGuide;
-import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 
 @SpringBootTest
+@RunWith(SpringRunner.class)
 public class TestTourGuideService {
 
-	private final RewardsService rewardsService = new RewardsService();
-	private final TourGuideService tourGuideService = new TourGuideService(rewardsService);
+    @Autowired
+    private TourGuideService tourGuideService;
+
 	private final User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 
 	@Before
@@ -39,7 +38,6 @@ public class TestTourGuideService {
 
 	@Test
 	public void getUserLocation() {
-		//TODO pk on mock pas le visitedLocation attendu puis spy sur trackUserLocation ?
 		VisitedLocationTourGuide visitedLocation = tourGuideService.trackUserLocation(user);
 		assertEquals(visitedLocation.userId, user.getUserId());
 	}
@@ -67,8 +65,8 @@ public class TestTourGuideService {
 		
 		List<User> allUsers = tourGuideService.getAllUsers();
 		
-		assertTrue(allUsers.contains(user));
-		assertTrue(allUsers.contains(user2));
+		assertTrue(allUsers.stream().anyMatch(u -> u.getUserName().equalsIgnoreCase(user.getUserName())));
+		assertTrue(allUsers.stream().anyMatch(u -> u.getUserName().equalsIgnoreCase(user2.getUserName())));
 	}
 	
 	@Test
@@ -93,20 +91,6 @@ public class TestTourGuideService {
 		List<ProviderTourGuide> providers = tourGuideService.getTripDeals(user);
 		
 		assertEquals(5, providers.size());
-	}
-
-	@Test
-	public void getAllCurrentLocations() {
-		List<User> userList = tourGuideService.getAllUsers();
-		User firstUser = userList.get(0);
-		DecimalFormat df = new DecimalFormat("#.######");
-		df.setRoundingMode(RoundingMode.HALF_UP);
-
-		String expected = "{\"" + firstUser.getUserId().toString() + "\":{\"longitude\":" + df.format(firstUser.getLastVisitedLocation().location.longitude) + ",\"latitude\":" + df.format(firstUser.getLastVisitedLocation().location.latitude) + "}";
-		List<Map<String, LocationTourGuide>> resultList = tourGuideService.getAllCurrentLocations();
-
-		Assert.assertEquals(userList.size(), resultList.size());
-		Assert.assertTrue(JsonStream.serialize(resultList).contains(expected));
 	}
 
 	@Test
