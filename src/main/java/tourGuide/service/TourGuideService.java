@@ -47,14 +47,17 @@ public class TourGuideService {
 		this.rewardsService = rewardsService;
 		if(testMode) {
 			logger.info("TestMode enabled");
-			logger.debug("Initializing users");
-			initializeInternalUsers();
-			logger.debug("Finished initializing users");
+			init();
 		}
 		this.gpsUtil = gpsUtil;
 		this.tripPricerProxy = tripPricerProxy;
 	}
 
+	public void init(){
+		logger.debug("Initializing users");
+		initializeInternalUsers();
+		logger.debug("Finished initializing users");
+	}
 	public void launchTracker(){
 		addShutDownHook();
 		scheduledExecutor.scheduleAtFixedRate(tracker::startTracking, 0, TRACKING_POLLING_INTERVAL, TimeUnit.SECONDS);

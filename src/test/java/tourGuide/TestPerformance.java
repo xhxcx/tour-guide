@@ -2,7 +2,6 @@ package tourGuide;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -62,7 +61,8 @@ public class TestPerformance {
 	@Test
 	public void highVolumeTrackLocation() {
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
-		InternalTestHelper.setInternalUserNumber(10);
+		InternalTestHelper.setInternalUserNumber(100000);
+		tourGuideService.init();
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
@@ -77,8 +77,9 @@ public class TestPerformance {
 	@Test
 	public void highVolumeGetRewards() {
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-		InternalTestHelper.setInternalUserNumber(10000);
-		tourGuideService.launchTracker();
+		InternalTestHelper.setInternalUserNumber(100000);
+		tourGuideService.init();
+		tracker.startTracking();
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 
@@ -92,7 +93,7 @@ public class TestPerformance {
 			assertTrue(user.getUserRewards().size() > 0);
 		}
 		stopWatch.stop();
-		tourGuideService.tracker.stopTracking();
+		tracker.stopTracking();
 
 		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds.");
 		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));

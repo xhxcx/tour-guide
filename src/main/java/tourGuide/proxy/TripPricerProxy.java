@@ -9,7 +9,7 @@ import tourGuide.model.ProviderTourGuide;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "tripPricer-service", url = "localhost:8083")
+@FeignClient(name = "tripPricer-service", url = "${trippricer.service.url}:8083")
 public interface TripPricerProxy {
 
     @RequestMapping("/getPrice")

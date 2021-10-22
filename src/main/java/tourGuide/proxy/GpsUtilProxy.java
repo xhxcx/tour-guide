@@ -9,7 +9,7 @@ import tourGuide.model.VisitedLocationTourGuide;
 
 import java.util.List;
 
-@FeignClient(name = "gpsUtil-service", url = "localhost:8081")
+@FeignClient(name = "gpsUtil-service", url = "${gpsutil.service.url}:8081")
 public interface GpsUtilProxy {
     @RequestMapping("/getAttraction")
     ResponseEntity<List<AttractionTourGuide>> getAttractions();

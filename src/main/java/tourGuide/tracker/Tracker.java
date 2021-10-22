@@ -29,6 +29,7 @@ public class Tracker {
 	 * Assures to shut down the Tracker thread
 	 */
 	public void stopTracking() {
+		logger.info("stop tracker");
 		stop = true;
 		executorService.shutdownNow();
 	}
@@ -37,23 +38,22 @@ public class Tracker {
 		StopWatch stopWatch = new StopWatch();
 		executorService = Executors.newFixedThreadPool(200);
 
-		if(Thread.currentThread().isInterrupted() || stop) {
-			logger.debug("Tracker stopping");
-			return;
-		}
-
 		List<User> users = tourGuideService.getAllUsers();
 		logger.debug("Begin Tracker. Tracking " + users.size() + " users.");
 		stopWatch.start();
-		users.forEach(user ->
-				executorService.execute(() ->
-						tourGuideService.trackUserLocation(user))
-		);
+		users.forEach(user -> {
+			if(Thread.currentThread().isInterrupted() || stop) {
+				logger.debug("Tracker stopping");
+				return;
+			}
+			executorService.execute(() ->
+					tourGuideService.trackUserLocation(user));
+		});
 		executorService.shutdown();
 		try {
-			boolean hasFinished = executorService.awaitTermination(300, TimeUnit.SECONDS);
+			boolean hasFinished = executorService.awaitTermination(1200, TimeUnit.SECONDS);
 			if (!hasFinished) {
-				logger.debug("fail to finish before 200 sec");
+				logger.debug("fail to finish before 20 minutes");
 				tourGuideService.scheduledExecutor.shutdownNow();
 			}
 			else {
