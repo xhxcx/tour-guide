@@ -3,6 +3,9 @@ package tourGuide.service;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import tourGuide.user.UserReward;
 @Service
 public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(200);
 
     private final GpsUtilProxy gpsUtil;
 
@@ -53,6 +57,18 @@ public class RewardsService {
 					}
 				}
 			}
+		}
+	}
+
+	public void userListCalculateRewards(List<User> userList) {
+		userList.forEach(user -> {
+			executorService.execute(() -> calculateRewards(user));
+		});
+		executorService.shutdown();
+		try {
+			executorService.awaitTermination(20, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 	

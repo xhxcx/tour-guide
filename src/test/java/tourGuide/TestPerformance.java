@@ -61,7 +61,7 @@ public class TestPerformance {
 	@Test
 	public void highVolumeTrackLocation() {
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
-		InternalTestHelper.setInternalUserNumber(100000);
+		InternalTestHelper.setInternalUserNumber(1000);
 		tourGuideService.init();
 
 		StopWatch stopWatch = new StopWatch();
@@ -77,7 +77,7 @@ public class TestPerformance {
 	@Test
 	public void highVolumeGetRewards() {
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-		InternalTestHelper.setInternalUserNumber(100000);
+		InternalTestHelper.setInternalUserNumber(1000);
 		tourGuideService.init();
 		tracker.startTracking();
 		StopWatch stopWatch = new StopWatch();
@@ -87,7 +87,7 @@ public class TestPerformance {
 		List<User> allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocationTourGuide(u.getUserId(), attraction, new Date())));
 
-	    allUsers.forEach(u -> rewardsService.calculateRewards(u));
+		rewardsService.userListCalculateRewards(allUsers);
 
 		for(User user : allUsers) {
 			assertTrue(user.getUserRewards().size() > 0);
